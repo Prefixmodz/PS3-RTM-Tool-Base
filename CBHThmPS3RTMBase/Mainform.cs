@@ -401,9 +401,9 @@ namespace CBHThmPS3RTMBase
                 Comboprocs.Items.Clear();
                 for (int i = 0; i < procs.Length; i++)
                 {
-                    string Sandwich = String.Empty;
-                    PS3.CCAPI.GetProcessName(procs[i], out Sandwich);
-                    Comboprocs.Items.Add(Sandwich);
+                    string sandwich = String.Empty;
+                    PS3.CCAPI.GetProcessName(procs[i], out sandwich);
+                    Comboprocs.Items.Add(sandwich);
                 }
                 procs = null;
             }
@@ -428,9 +428,10 @@ namespace CBHThmPS3RTMBase
             {
                 if (Comboprocs.SelectedIndex == 0)
                 {
-                    PS3MANAPI.AttachProcess();
+                    uint SelectedProc = procs[Comboprocs.SelectedIndex = 0];
+                    PS3MANAPI.AttachProcess(SelectedProc);
                     PS3.PS3MAPI.RingBuzzer(PS3ManagerAPI.PS3MAPI.PS3_CMD.BuzzerMode.Single);
-                    PS3.PS3MAPI.Notify("PS3MAPI Attached To:" + Comboprocs.Text, PS3ManagerAPI.PS3MAPI.PS3_CMD.NotifyIcon.Info, PS3ManagerAPI.PS3MAPI.PS3_CMD.NotifySound.SystemOk);
+                    PS3.PS3MAPI.Notify(Comboprocs.Text, PS3ManagerAPI.PS3MAPI.PS3_CMD.NotifyIcon.Info, PS3ManagerAPI.PS3MAPI.PS3_CMD.NotifySound.SystemOk);
                     MessageBox.Show("Success!");
                 }
                 else
@@ -438,24 +439,26 @@ namespace CBHThmPS3RTMBase
                     MessageBox.Show("Make sure you have selected a Process", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
-            else
-            {
-                if (PS3.GetCurrentAPI() == SelectAPI.ControlConsole)
+            else if (PS3.GetCurrentAPI() == SelectAPI.ControlConsole)
                 {
                     if (Comboprocs.SelectedIndex == 0)
                     {
-                        PS3.CCAPI.AttachProcess();
-                        PS3.CCAPI.RingBuzzer(CCAPI.BuzzerMode.Single);
-                        PS3.CCAPI.Notify(CCAPI.NotifyIcon.INFO, "CCAPI Attached To:" + Comboprocs.Text);
-                        MessageBox.Show("Success!");
-                    }
-                    else
-                    {
-                        MessageBox.Show("Make sure you have selected a Process", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        try
+                        {
+
+                            uint SelectedProc = procs[Comboprocs.SelectedIndex];
+                            PS3.CCAPI.AttachProcess(SelectedProc);
+                            PS3.CCAPI.RingBuzzer(CCAPI.BuzzerMode.Single);
+                            PS3.CCAPI.Notify(CCAPI.NotifyIcon.INFO, Comboprocs.Text); //"CCAPI Attached To:\n\n" + Comboprocs.Text
+                            MessageBox.Show("Success!");
+                        }
+                        catch
+                        {
+                            MessageBox.Show("Make sure you have selected a Process", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
                     }
                 }
             }
-        }
 
         private void CheckboxWAWGDMode_CheckedChanged(object sender)
         {

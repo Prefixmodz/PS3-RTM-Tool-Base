@@ -958,7 +958,7 @@ namespace CBHThmPS3RTMBase
             this.Comboprocs.MinimumSize = new System.Drawing.Size(200, 30);
             this.Comboprocs.Name = "Comboprocs";
             this.Comboprocs.Padding = new System.Windows.Forms.Padding(1);
-            this.Comboprocs.Size = new System.Drawing.Size(284, 30);
+            this.Comboprocs.Size = new System.Drawing.Size(281, 30);
             this.Comboprocs.TabIndex = 4;
             this.Comboprocs.Texts = "";
             // 
