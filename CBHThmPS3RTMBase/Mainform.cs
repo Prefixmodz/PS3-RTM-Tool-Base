@@ -76,6 +76,7 @@ namespace CBHThmPS3RTMBase
 
         private void Mainform_Load(object sender, EventArgs e)
         {
+            PS3.TMAPI.PS3TMAPI_NET();
             threadIsRunning = true;
             GetAPI.Start();
             TimerDnT.Start();
@@ -94,13 +95,26 @@ namespace CBHThmPS3RTMBase
 
         private void RadiobtnTMAPI_CheckedChanged(object sender, EventArgs e)
         {
-            MessageBox.Show("TMAPI Not Yet Implemented!\n\nCurrentAPI Changed to TargetManager", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
             PS3.ChangeAPI(SelectAPI.TargetManager);
         }
 
         private void btnConnect_Click(object sender, EventArgs e)
         {
-            if (PS3.GetCurrentAPI() == SelectAPI.ControlConsole)
+            if (PS3.GetCurrentAPI() == SelectAPI.TargetManager)
+            {
+                if (PS3.ConnectTarget())
+                {
+                    PS3.TMAPI.InitComms();
+                    LabelStatus.Text = "Connected";
+                    LabelStatus.ForeColor = Color.Green;
+                    MessageBox.Show("Connected to Console\n\nwith Target Manager API", "Connected", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBox.Show("Failed to Connect to Console!\n\nMake sure ProDG is installed!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            else if (PS3.GetCurrentAPI() == SelectAPI.ControlConsole)
             {
                 if (PS3.ConnectTarget(BoxIP.Text))
                 {
@@ -115,7 +129,10 @@ namespace CBHThmPS3RTMBase
                     LabelStatus.ForeColor = Color.Green;
                     MessageBox.Show("Connected to Console\n\nwith Control Console API", "Connected", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
-                else MessageBox.Show("Failed to Connect to Console!\n\nMake sure Control Console API is Installed On Console And PC!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                else
+                {
+                    MessageBox.Show("Failed to Connect to Console!\n\nMake sure Control Console API is Installed On Console And PC!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
             else if (PS3.GetCurrentAPI() == SelectAPI.PS3Manager)
             {
@@ -144,14 +161,17 @@ namespace CBHThmPS3RTMBase
                         }
                         //this.Comboprocs.SelectedIndex = 0;
                     }
-                    else MessageBox.Show("Failed to Connect to Console!\n\nMake sure PS3MAPI is enabled in WebMan Setup!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    else
+                    {
+                        MessageBox.Show("Failed to Connect to Console!\n\nMake sure PS3MAPI is enabled in WebMan Setup!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
             }
         }
 
 
-        private void btnDisconnect_Click(object sender, EventArgs e)
-        {
+            private void btnDisconnect_Click(object sender, EventArgs e)
+            {
             if (PS3.GetCurrentAPI() == SelectAPI.ControlConsole)
             {
                 PS3.Buzzer(PS3API.BuzzerMode.Single);
@@ -165,6 +185,13 @@ namespace CBHThmPS3RTMBase
             {
                 PS3.PS3MAPI.RingBuzzer(PS3ManagerAPI.PS3MAPI.PS3_CMD.BuzzerMode.Single);
                 PS3.PS3MAPI.Notify("Console Disconnected", PS3ManagerAPI.PS3MAPI.PS3_CMD.NotifyIcon.Caution, PS3ManagerAPI.PS3MAPI.PS3_CMD.NotifySound.SystemOk);
+                PS3.DisconnectTarget();
+                LabelStatus.Text = "Disconnected";
+                LabelStatus.ForeColor = Color.Red;
+                MessageBox.Show("Console Disconnected");
+            }
+            if (PS3.GetCurrentAPI() == SelectAPI.TargetManager)
+            {
                 PS3.DisconnectTarget();
                 LabelStatus.Text = "Disconnected";
                 LabelStatus.ForeColor = Color.Red;
@@ -209,10 +236,25 @@ namespace CBHThmPS3RTMBase
                     MessageBox.Show("Make sure you have a game running!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+            if (PS3.GetCurrentAPI() == SelectAPI.TargetManager)
+            {
+                try
+                {
+
+                    PS3.AttachProcess();
+                    LabelStatus.Text = "Connected + Attached";
+                    LabelStatus.ForeColor = Color.Green;
+                    MessageBox.Show(PS3.GetCurrentAPI() + "   Attached to current game process!");
+                }
+                catch
+                {
+                    MessageBox.Show("Make sure you have a game running!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
 
-        private void btnSendNoti_Click(object sender, EventArgs e)
-        {
+            private void btnSendNoti_Click(object sender, EventArgs e)
+            {
             if (PS3.GetCurrentAPI() == SelectAPI.PS3Manager)
             {
                 PS3.PS3MAPI.Notify(BoxNotify.Text, PS3ManagerAPI.PS3MAPI.PS3_CMD.NotifyIcon.Info, PS3ManagerAPI.PS3MAPI.PS3_CMD.NotifySound.SystemOk);
