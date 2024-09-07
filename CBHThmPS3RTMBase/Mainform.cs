@@ -80,7 +80,6 @@ namespace CBHThmPS3RTMBase
             threadIsRunning = true;
             GetAPI.Start();
             TimerDnT.Start();
-            MessageBox.Show("Welcome Hen/PS3MAPI Stuff is broken lol Check attach button code Someone might be able to fix it idk\n\nCredits:\n\nEternalModz\n\nEveryone that helped With the Development of This Theme\n\nTheme Found here:https://github.com/EternalModz/CrEaTiiOn-Brotherhood-Theme-Library-NET\n\nDeveloper of this Project:\n\nPrefixModzツ", "Welcome//Credits", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void RadiobtnCCAPI_CheckedChanged(object sender, EventArgs e)
@@ -221,7 +220,8 @@ namespace CBHThmPS3RTMBase
             {
                 try
                 {
-                    PS3MANAPI.AttachProcess(PS3MANAPI.Process.Processes_Pid[0]); //hen/ps3mapi stuff is pretty broken i never done anything with ps3mapi lol
+                    PS3MANAPI.Process.GetPidProcesses();
+                    PS3MANAPI.AttachProcess(PS3MANAPI.Process.Processes_Pid[0]); 
                     if (PS3MANAPI.IsAttached)
                     {
                         PS3.Buzzer(PS3API.BuzzerMode.Double);
